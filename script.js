@@ -8,12 +8,24 @@ function getUserData() {
 			return res.json();
 		})
 		.then((data) => {
-			displayChar(data);
-			hideSpinner();
+			return fetch(`${data.episode[0]}`)
+				.then((res) => res.json())
+				.then((epData) => {
+					epUsedData = {
+						id: epData.id,
+						name: epData.name,
+					};
+					return epUsedData;
+				})
+				.then((epData) => {
+					displayChar(data, epData);
+
+					hideSpinner();
+				});
 		});
 }
 
-function displayChar(char) {
+function displayChar(char, epData) {
 	console.log(char.id);
 	if (char.gender === 'Male') {
 		document.body.style.backgroundColor = '#50C878';
@@ -23,7 +35,8 @@ function displayChar(char) {
 		document.body.style.backgroundColor = '#FFC107';
 	}
 	const charDiv = document.querySelector('#user');
-
+	const status = char.status === 'unknown' ? 'Unknown' : char.status;
+	const gender = char.gender === 'unknown' ? 'Unknown' : char.gender;
 	charDiv.innerHTML = `<div class="flex justify-between">
 					<div class="flex">
 						<img
@@ -38,13 +51,17 @@ function displayChar(char) {
 								<span class="font-bold">Appearances: </span>${char.episode.length}
 							</p>
 							<p class="text-xl">
+								<span class="font-bold">First Appearance: </span>Episode: ${epData.id} ,${epData.name} 
+								
+							</p>
+							<p class="text-xl">
 								<span class="font-bold">Species: </span>${char.species}
 							</p>
 							<p class="text-xl">
 								<span class="font-bold">Location: </span> ${char.location.name}
 							</p>
-							<p class="text-xl"><span class="font-bold">Status: </span>${char.status}</p>
-							<p class="text-xl"><span class="font-bold">Gender: </span>${char.gender}</p>
+							<p class="text-xl"><span class="font-bold">Status: </span>${status}</p>
+							<p class="text-xl"><span class="font-bold">Gender: </span>${gender}</p>
 						</div>
 					</div>
 				</div>`;
